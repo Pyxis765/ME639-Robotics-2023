@@ -16,7 +16,7 @@ for _ in range(rows):  # This for loop is to arrange rows
     r = []  
     for __ in range(Columns):  # This for loop is to arrange columns  
         r.append(int(input()))  
-        dh_matrix.append(r)  
+dh_matrix.append(r)  
 
 # Printing the matrix given by user
 print("Your DH Matrix is as below:")  
