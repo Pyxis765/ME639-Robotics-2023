@@ -1,0 +1,105 @@
+import numpy as np
+
+N = int(input("Number of Joints: "))
+print("Given the configuration of the manipulator below.\nFor P, put 0 and for R, put 1 in one line with space.")
+Configuration = (input("Enter the configuration here: ").split( ))
+
+rows = N
+Columns = 4  
+
+# Initializing the matrix  
+dh_matrix = []  
+print("Give the entries row-wise:")  
+
+# For user input  
+for _ in range(rows):  # This for loop is to arrange rows  
+    r = []  
+    for __ in range(Columns):  # This for loop is to arrange columns  
+        r.append(int(input()))  
+        dh_matrix.append(r)  
+
+# Printing the matrix given by user
+print("Your DH Matrix is as below:")  
+for _ in range(rows):  
+    for __ in range(Columns):  
+        print(dh_matrix[_][__], end=" ")  
+    print() 
+
+H0i = []
+d0i = []
+R0i = []
+
+#Calculating the Homogeneous Transformation Matrices from D-H Table
+for i in range(0,N):
+
+    Hi =[[np.cos(dh_matrix[i][1]), -np.sin(dh_matrix[i][1])*np.cos(dh_matrix[i][3]), np.sin(dh_matrix[i][1])*np.sin(dh_matrix[i][3]), dh_matrix[i][2]*np.cos(dh_matrix[i][1])],
+         [np.sin(dh_matrix[i][1]), np.cos(dh_matrix[i][1])*np.cos(dh_matrix[i][3]), -np.cos(dh_matrix[i][1])*np.sin(dh_matrix[i][3]), dh_matrix[i][2]*np.sin(dh_matrix[i][1])],
+         [ 0, np.sin(dh_matrix[i][3]), np.cos(dh_matrix[i][3]), dh_matrix[i][0]],
+         [ 0, 0, 0, 1]]
+    H0i.append(Hi) 
+
+    di =[[dh_matrix[i][2]*np.cos(dh_matrix[i][1])],
+         [dh_matrix[i][2]*np.sin(dh_matrix[i][1])],
+         [dh_matrix[i][0]]] 
+    d0i.append(di)
+
+    Ri =[[np.cos(dh_matrix[i][1]), -np.sin(dh_matrix[i][1])*np.cos(dh_matrix[i][3]), np.sin(dh_matrix[i][1])*np.sin(dh_matrix[i][3])],
+         [np.sin(dh_matrix[i][1]), np.cos(dh_matrix[i][1])*np.cos(dh_matrix[i][3]), -np.cos(dh_matrix[i][1])*np.sin(dh_matrix[i][3])],
+         [ 0, np.sin(dh_matrix[i][3]), np.cos(dh_matrix[i][3])]]
+    R0i.append(Ri)
+
+def R0n(n):
+    R0n_final = np.dot(R0i[0], R0i[1])
+    for k in range(n-2):
+        R0n_final = np.dot(R0n_final, R0i[k+2])
+    return R0n_final
+
+def H0n(n):
+    H0n_final = np.dot(H0i[0], H0i[1])
+    for j in range(n-2):
+        H0n_final = np.dot(H0n_final, H0i[j+2])
+    return H0n_final
+
+def d0n(n):
+    d0n_final = np.dot(d0i[0], d0i[1])
+    for l in range(n-2):
+        d0n_final = np.dot(d0n_final, d0i[l+2])
+    return d0n_final
+
+# b) Calculating the end-Effector position
+dnn = [[0],
+       [0],
+       [0],
+       [1]]  #End effector coordinate with respect to the last current frame that is n itself.
+P0n = np.dot(H0n(N), dnn)
+print(f"The end effector position is {P0n[0]} i + {P0n[1]} j + {P0n[2]} k")
+
+# a) Calculating the Jacobian mattrix
+jw = [0]*N
+jv = [0]*N
+
+k_cap = [[0], [0], [1]]
+
+for i in range(N):
+    if int(Configuration[i]) == 0 :
+        jw[i] = [[0],[0],[0]]
+    else:
+        jw[i] = np.dot(R0n(i), k_cap)
+
+for j in range(N):
+    if int(Configuration[j]) == 0:
+        jv[j] = np.dot(R0n(j), k_cap)
+    else:
+        jv[j] = np.cross(np.dot(R0n(j), k_cap), (d0n(N) - d0n(j))) 
+print(jv)
+print(jw)
+
+
+# # c) Calculating the End-Effector Velocities
+
+# print("Insert the values of q1_dot, q2_dot, ...... below")
+# q_dot = input().split()
+
+# x_dot = np.dot([[jv], [jw]], q_dot)
+
+# # print(x_dot)
