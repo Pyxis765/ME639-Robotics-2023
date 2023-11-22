@@ -13,7 +13,7 @@ def desired_curve(t):                # Function for path
     return x, y
 
 def inv_kine(x, y):
-    c2 = (((x**2)/L1) + ((y**2)/L2) - L1**2 - L2**2) / (2 * L1 * L2)
+    c2 = (((x**2)/L1) + ((y**2)/L2) - L1**2 - L2**2) / (2 * L1 * L2)   #Ellipse fucntion for tracing
     s2 = np.sqrt(1 - c2**2)
     q1 = np.arctan2(y, x) - np.arctan2(L2 * s2, L1 + L2 * c2)
     q2 = np.arctan2(s2, c2)
@@ -32,7 +32,7 @@ link1, = ax.plot([], [], 'b-', lw=2)
 link2, = ax.plot([], [], 'g-', lw=2, color='yellow')
 link3, = ax.plot([], [], 'r-', lw=2)
 endpoint, = ax.plot([], [], 'ro', color='black')
-trajectory, = ax.plot([], [], 'k-', lw=1, color= 'green')  # Black line for tracing the trajectory
+trajectory, = ax.plot([], [], 'k-', lw=1, color= 'green')  # Green line for tracing the trajectory
 
 trajectory_x = []  # Lists to store the trajectory
 trajectory_y = []
